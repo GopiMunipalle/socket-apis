@@ -8,5 +8,6 @@ const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 router.post('/add', todoController_1.default.addTask);
 router.get('/get', todoController_1.default.getAllTasks);
-router.patch('/update', todoController_1.default.updateTask);
+router.patch('/update/:id', todoController_1.default.updateTask);
+router.delete('/delete/:id', todoController_1.default.deleteTask);
 exports.default = router;

@@ -56,4 +56,17 @@ const updateTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(500).send({ error: "Internal Server Error" });
     }
 });
-exports.default = { addTask, getAllTasks, updateTask };
+const deleteTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const deletTaskQuery = yield Todo_1.default.findByIdAndDelete(req.params.id);
+        if (!deletTaskQuery) {
+            res.status(401).send({ error: "id is not found" });
+        }
+        res.status(200).send({ message: "user deleted successfully" });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send({ error: "Internal Server Error" });
+    }
+});
+exports.default = { addTask, getAllTasks, updateTask, deleteTask };

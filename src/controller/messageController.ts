@@ -1,26 +1,24 @@
 import messageModel from "../models/Messages";
 import userModel from "../models/User";
 import { Request, Response } from "express";
-import { io } from "../app";
 
 const sendMesssage = async (req: Request, res: Response) => {
   try {
-    const { senderId, receiverId, content } = req.body;
-
-    const sender = await userModel.findById(senderId);
+    const { receiverId, content } = req.body;
+    const userEmail = req.email;
+    const sender = await userModel.findOne({ email: userEmail });
     const receiver = await userModel.findById(receiverId);
     if (!sender || !receiver) {
       return res.status(404).json({ error: "Sender or receiver not found" });
     }
 
-    const message = await messageModel.create({
-      sender: senderId,
+    const chat = await messageModel.create({
+      sender: sender._id,
       receiver: receiverId,
-      content,
+      content: { message: content },
     });
 
-    io.to(receiver as any).emit("chat message", message);
-    res.status(201).json(message);
+    return res.status(201).json(chat);
   } catch (error) {
     console.error("Error sending message:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -29,10 +27,12 @@ const sendMesssage = async (req: Request, res: Response) => {
 
 const receiveMessage = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
-
+    const { receiverId } = req.params;
+    const userEmail = req.email;
+    const user = await userModel.findOne({ email: userEmail });
+    let userId = user?._id as any;
     const messages = await messageModel.find({
-      $or: [{ sender: userId }, { receiver: userId }],
+      $and: [{ sender: userId }, { receiver: receiverId }],
     });
 
     return res.status(200).json(messages);

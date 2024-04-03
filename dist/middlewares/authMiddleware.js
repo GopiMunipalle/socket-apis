@@ -36,4 +36,4 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         return res.status(500).send({ error: "Internal Server Error" });
     }
 });
-exports.default = authMiddleware;
+exports.default = { authMiddleware };

@@ -63,18 +63,27 @@
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      let counter = 0;
-
-      const socket = io();
+      const socket = io("http://localhost:8080");
 
       const form = document.getElementById("form");
       const input = document.getElementById("input");
       const messages = document.getElementById("messages");
 
-      form.addEventListener("submit", (e) => {
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        const receiverId = "660ad82141f67590b1d7116e";
+        const content = input.value;
+        const response = await fetch("/chat/sendMessage", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtyaXNobmFAZ21haWwuY29tIiwiaWF0IjoxNzEyMDcwODMyLCJleHAiOjE3MTIxMDY4MzJ9.PpBwBEoEvyQdHW1xC_dvXTBN_DTLW4cxuyS4dtPyNgM",
+          },
+          body: JSON.stringify({ receiverId, content }),
+        });
         if (input.value) {
-          socket.emit("chat message", input.value);
+          socket.emit("chat message", { receiverId, content });
           input.value = "";
         }
       });
@@ -84,7 +93,13 @@
         item.textContent = msg;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
-        // socket.auth.serverOffset = serverOffset;
+      });
+
+      socket.emit("joinRoom");
+
+      socket.emit("send Message", {
+        roomId: "660c369c520dd7a108851306",
+        content: "Hello",
       });
     </script>
   </body>

@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-const authMiddleware = async (
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -15,11 +15,11 @@ const authMiddleware = async (
     if (!jwtToken) {
       return res.status(400).send({ error: "Provide token" });
     }
-    jwt.verify(jwtToken, "secret", (error, payload) => {
+    jwt.verify(jwtToken, "secret", (error: any, payload: any) => {
       if (error) {
         return res.status(400).send({ error: "Invalid token" });
       }
-      req.email = (jwt as JwtPayload).email;
+      req.email = (payload as JwtPayload).email;
       next();
     });
   } catch (error) {
@@ -27,5 +27,3 @@ const authMiddleware = async (
     return res.status(500).send({ error: "Internal Server Error" });
   }
 };
-
-export default authMiddleware;
